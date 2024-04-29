@@ -1,53 +1,84 @@
-#include <opencv/highgui.h> ///¨Ï¥Î OpenCV 2.1 ¤ñ¸ûÂ²³æ, ¥u­n¥Î High GUI §Y¥i
+#include <opencv/highgui.h> ///ä½¿ç”¨ OpenCV 2.1 æ¯”è¼ƒç°¡å–®, åªè¦ç”¨ High GUI å³å¯
 #include <opencv/cv.h>
 #include <GL/glut.h>
 int myTexture(char * filename)
 {
-    IplImage * img = cvLoadImage(filename); ///OpenCVÅª¹Ï
-    cvCvtColor(img,img, CV_BGR2RGB); ///OpenCVÂà¦â±m (»İ­ncv.h)
-    glEnable(GL_TEXTURE_2D); ///1. ¶}±Ò¶K¹Ï¥\¯à
-    GLuint id; ///·Ç³Æ¤@­Ó unsigned int ¾ã¼Æ, ¥s ¶K¹ÏID
-    glGenTextures(1, &id); /// ²£¥ÍGenerate ¶K¹ÏID
-    glBindTexture(GL_TEXTURE_2D, id); ///¸j©wbind ¶K¹ÏID
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); /// ¶K¹Ï°Ñ¼Æ, ¶W¹L¥]¸Ëªº½d¹ÏT, ´N­«ÂĞ¶K¹Ï
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); /// ¶K¹Ï°Ñ¼Æ, ¶W¹L¥]¸Ëªº½d¹ÏS, ´N­«ÂĞ¶K¹Ï
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); /// ¶K¹Ï°Ñ¼Æ, ©ñ¤j®Éªº¤º´¡, ¥Î³ÌªñÂI
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); /// ¶K¹Ï°Ñ¼Æ, ÁY¤p®Éªº¤º´¡, ¥Î³ÌªñÂI
+    IplImage * img = cvLoadImage(filename); ///OpenCVè®€åœ–
+    cvCvtColor(img,img, CV_BGR2RGB); ///OpenCVè½‰è‰²å½© (éœ€è¦cv.h)
+    glEnable(GL_TEXTURE_2D); ///1. é–‹å•Ÿè²¼åœ–åŠŸèƒ½
+    GLuint id; ///æº–å‚™ä¸€å€‹ unsigned int æ•´æ•¸, å« è²¼åœ–ID
+    glGenTextures(1, &id); /// ç”¢ç”ŸGenerate è²¼åœ–ID
+    glBindTexture(GL_TEXTURE_2D, id); ///ç¶å®šbind è²¼åœ–ID
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); /// è²¼åœ–åƒæ•¸, è¶…éåŒ…è£çš„ç¯„åœ–T, å°±é‡è¦†è²¼åœ–
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); /// è²¼åœ–åƒæ•¸, è¶…éåŒ…è£çš„ç¯„åœ–S, å°±é‡è¦†è²¼åœ–
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); /// è²¼åœ–åƒæ•¸, æ”¾å¤§æ™‚çš„å…§æ’, ç”¨æœ€è¿‘é»
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); /// è²¼åœ–åƒæ•¸, ç¸®å°æ™‚çš„å…§æ’, ç”¨æœ€è¿‘é»
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img->width, img->height, 0, GL_RGB, GL_UNSIGNED_BYTE, img->imageData);
     return id;
 }
 
-///¤W¶g¦³°µ¹L, ½Ğ¥Î°Å¶Kªº
+///ä¸Šé€±æœ‰åšé, è«‹ç”¨å‰ªè²¼çš„
 #include <GL/glut.h>
 #include "glm.h"
 GLMmodel * pmodel = NULL;
 void drawmodel(void)
 {
     if (!pmodel) {
-        pmodel = glmReadOBJ("gundam.obj");
-        ///¤W¶gªº¼Ò«¬ÀÉ,©ñ¦b©_©Çªº¥Ø¿ı¸Ì ®à­±\freeglut\bin
-        ///¥»¶g,­n´«§ó¦nªº¦a¤è
+        pmodel = glmReadOBJ("hand1.obj");
+        ///ä¸Šé€±çš„æ¨¡å‹æª”,æ”¾åœ¨å¥‡æ€ªçš„ç›®éŒ„è£¡ æ¡Œé¢\freeglut\bin
+        ///æœ¬é€±,è¦æ›æ›´å¥½çš„åœ°æ–¹
         if (!pmodel) exit(0);
         glmUnitize(pmodel);
         glmFacetNormals(pmodel);
         glmVertexNormals(pmodel, 90.0);
     }
 
-    glmDraw(pmodel, GLM_SMOOTH | GLM_MATERIAL | GLM_TEXTURE);
+    glmDraw(pmodel, GLM_SMOOTH | GLM_TEXTURE);
 }
+float angle=0; ///åŠ å…¥æ—‹è½‰
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    drawmodel(); ///glutSolidTeapot( 0.3 );
+    glPushMatrix(); ///åŠ å…¥æ—‹è½‰
+        glRotatef(angle++, 0, 1, 0); ///åŠ å…¥æ—‹è½‰
+        drawmodel(); ///glutSolidTeapot( 0.3 );
+    glPopMatrix(); ///åŠ å…¥æ—‹è½‰
     glutSwapBuffers();
 }
+const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_position[] = { 2.0f, 5.0f, -5.0f, 0.0f };
+
+const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat high_shininess[] = { 100.0f };
 int main(int argc, char* argv[])
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
     glutCreateWindow("week07-2 obj gundam opencv texture");
     glutDisplayFunc(display);
+    glutIdleFunc(display); ///åŠ å…¥æ—‹è½‰
     myTexture("Diffuse.jpg");
 
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_LIGHT0);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
     glutMainLoop();
 }
